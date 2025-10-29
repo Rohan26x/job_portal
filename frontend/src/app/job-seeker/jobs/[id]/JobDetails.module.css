@@ -1,0 +1,115 @@
+.container {
+  max-width: 900px;
+}
+
+.backBtn {
+  background: white;
+  border: 2px solid #ddd;
+  padding: 8px 16px;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.backBtn:hover {
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.loading,
+.error {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.1rem;
+}
+
+.loading {
+  color: #667eea;
+}
+
+.error {
+  color: #dc3545;
+}
+
+.jobCard {
+  background: white;
+  border-radius: 12px;
+  padding: 2.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.location {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.section h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.description {
+  color: #666;
+  line-height: 1.8;
+  font-size: 1.05rem;
+  white-space: pre-wrap;
+}
+
+.errorBox {
+  background: #fee;
+  color: #c33;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #fcc;
+}
+
+.successBox {
+  background: #efe;
+  color: #2a2;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #cfc;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.applyBtn {
+  padding: 14px 32px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.applyBtn:hover:not(:disabled) {
+  background: #5568d3;
+}
+
+.applyBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
