@@ -11,9 +11,8 @@ class Job(Base):
     job_title = Column(String(255), nullable=False)
     description = Column(Text, nullable=False)
     location = Column(String(255), nullable=False)
-    # REMOVED: posted_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
     recruiter = relationship("Recruiter", back_populates="jobs")
     applications = relationship("Application", back_populates="job", cascade="all, delete-orphan")
-    job_skills = relationship("JobSkill", back_populates="job", cascade="all, delete-orphan")
+    # Removed: job_skills = relationship("JobSkill", back_populates="job", cascade="all, delete-orphan")

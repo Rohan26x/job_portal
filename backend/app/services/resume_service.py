@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.db.models.resume import Resume, Certification
-from app.db.models.skill import Skill, ResumeSkill
+from app.db.models.skill import Skill
 from app.db.models.job_seeker import JobSeeker
 from app.schemas.resume import ResumeCreate, ResumeUpdate
 
@@ -42,12 +42,7 @@ class ResumeService:
                     skill = Skill(skill_name=skill_name)
                     db.add(skill)
                     db.flush()
-
-                resume_skill = ResumeSkill(
-                    resume_id=resume.resume_id,
-                    skill_id=skill.skill_id
-                )
-                db.add(resume_skill)
+                resume.resume_skills.append(skill)
 
         if resume_data.certifications:
             for cert_data in resume_data.certifications:
@@ -87,20 +82,14 @@ class ResumeService:
             resume.about_me = resume_data.about_me
 
         if resume_data.skills is not None:
-            db.query(ResumeSkill).filter(ResumeSkill.resume_id == resume_id).delete()
-
+            resume.resume_skills.clear()
             for skill_name in resume_data.skills:
                 skill = db.query(Skill).filter(Skill.skill_name == skill_name).first()
                 if not skill:
                     skill = Skill(skill_name=skill_name)
                     db.add(skill)
                     db.flush()
-
-                resume_skill = ResumeSkill(
-                    resume_id=resume.resume_id,
-                    skill_id=skill.skill_id
-                )
-                db.add(resume_skill)
+                resume.resume_skills.append(skill)
 
         if resume_data.certifications is not None:
             db.query(Certification).filter(Certification.resume_id == resume_id).delete()
@@ -119,12 +108,10 @@ class ResumeService:
 
     @staticmethod
     def get_resume_by_id(db: Session, resume_id: int):
-        """Get resume by ID"""
         return db.query(Resume).filter(Resume.resume_id == resume_id).first()
 
     @staticmethod
     def get_resume_by_job_seeker(db: Session, user_id: int):
-        """Get resume by job seeker user_id"""
         job_seeker = db.query(JobSeeker).filter(JobSeeker.user_id == user_id).first()
         if not job_seeker:
             return None
