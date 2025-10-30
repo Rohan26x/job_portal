@@ -30,7 +30,7 @@ export default function ResumePage() {
       setFormData({
         about_me: response.data.about_me || '',
         skills: response.data.resume_skills?.length > 0
-          ? response.data.resume_skills.map(rs => ({ skill_name: rs.skill.skill_name }))
+          ? response.data.resume_skills.map(rs => ({ skill_name: rs.skill_name }))
           : [{ skill_name: '' }],
         education: response.data.educations?.length > 0
           ? response.data.educations
@@ -373,7 +373,7 @@ export default function ResumePage() {
                     <div className={styles.skillsList}>
                       {resume.resume_skills.map((rs, index) => (
                         <span key={index} className={styles.skillBadge}>
-                          {rs.skill.skill_name}
+                          {rs.skill_name}
                         </span>
                       ))}
                     </div>

@@ -47,4 +47,54 @@ def create_resume(
     """Create a new resume"""
     return ResumeService.create_resume(db, current_user.user_id, resume_data)
 
+
+@router.get("/me", response_model=ResumeResponse)
+def get_my_resume(
+    current_user=Depends(get_current_job_seeker),
+    db: Session = Depends(get_db)
+):
+    """Get resume for the current authenticated job seeker"""
+    resume = ResumeService.get_resume_by_job_seeker(db, current_user.user_id)
+    if not resume:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No resume found for user")
+    # Prepare skills and certifications for serialization if needed
+    resume_data = ResumeResponse(
+        resume_id=resume.resume_id,
+        job_seeker_id=resume.job_seeker_id,
+        about_me=resume.about_me,
+        resume_skills=[{"skill_name": skill.skill_name} for skill in getattr(resume, 'skills', [])],
+        certifications=[
+            {
+                "cert_name": cert.cert_name,
+                "issuing_organization": cert.issuing_organization
+            } for cert in getattr(resume, 'certifications', [])
+        ]
+    )
+    return resume_data
+
+
+@router.put("/{resume_id}", response_model=ResumeResponse)
+def update_resume(
+    resume_id: int,
+    resume_update: ResumeUpdate,
+    current_user=Depends(get_current_job_seeker),
+    db: Session = Depends(get_db)
+):
+    """Update an existing resume by ID for the current user"""
+    resume = ResumeService.update_resume(db, resume_id, current_user.user_id, resume_update)
+    # Prepare skills and certifications for serialization if needed
+    resume_data = ResumeResponse(
+        resume_id=resume.resume_id,
+        job_seeker_id=resume.job_seeker_id,
+        about_me=resume.about_me,
+        resume_skills=[{"skill_name": skill.skill_name} for skill in getattr(resume, 'skills', [])],
+        certifications=[
+            {
+                "cert_name": cert.cert_name,
+                "issuing_organization": cert.issuing_organization
+            } for cert in getattr(resume, 'certifications', [])
+        ]
+    )
+    return resume_data
+
 # ... rest of your endpoints below

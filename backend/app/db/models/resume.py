@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from app.db.database import Base
+from app.db.models.skill import Skill, resume_skills_association
 
 
 class Resume(Base):
@@ -12,7 +13,11 @@ class Resume(Base):
 
     # Relationships
     job_seeker = relationship("JobSeeker", back_populates="resume")
-    resume_skills = relationship("ResumeSkill", back_populates="resume", cascade="all, delete-orphan")
+    skills = relationship(
+        "Skill",
+        secondary=resume_skills_association,
+        backref="resumes"
+    )
     certifications = relationship("Certification", back_populates="resume", cascade="all, delete-orphan")
 
 
