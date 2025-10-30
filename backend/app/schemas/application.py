@@ -1,26 +1,19 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from datetime import date
 from typing import Optional
 
-
-class ApplicationBase(BaseModel):
+class ApplicationCreate(BaseModel):
     job_id: int
 
-
-class ApplicationCreate(ApplicationBase):
-    pass
-
-
 class ApplicationUpdate(BaseModel):
-    status: str = Field(..., pattern="^(pending|reviewed|accepted|rejected)$")
-
+    status: Optional[str] = None
 
 class ApplicationResponse(BaseModel):
     application_id: int
     job_id: int
-    seeker_id: int
-    application_date: date
+    job_seeker_id: int  # Changed from seeker_id
     status: str
+    application_date: Optional[date] = None
 
     class Config:
         from_attributes = True

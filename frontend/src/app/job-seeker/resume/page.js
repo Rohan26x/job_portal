@@ -27,7 +27,6 @@ export default function ResumePage() {
       const response = await resumeAPI.getMyResume();
       setResume(response.data);
 
-      // Set form data from existing resume
       setFormData({
         about_me: response.data.about_me || '',
         skills: response.data.resume_skills?.length > 0
@@ -41,9 +40,12 @@ export default function ResumePage() {
           : [{ cert_name: '', issuing_organization: '' }],
       });
     } catch (error) {
-      console.error('Error fetching resume:', error);
-      // If no resume exists, stay in create mode
-      setIsEditing(true);
+      if (error.response?.status === 404) {
+        console.log('No resume found, user can create one');
+        setIsEditing(true);
+      } else {
+        console.error('Error fetching resume:', error);
+      }
     } finally {
       setLoading(false);
     }
@@ -358,7 +360,6 @@ export default function ResumePage() {
               </div>
             ) : (
               <>
-                {/* View About Me */}
                 {resume.about_me && (
                   <div className={styles.section}>
                     <h2>About Me</h2>
@@ -366,7 +367,6 @@ export default function ResumePage() {
                   </div>
                 )}
 
-                {/* View Skills */}
                 {resume.resume_skills?.length > 0 && (
                   <div className={styles.section}>
                     <h2>Skills</h2>
@@ -380,7 +380,6 @@ export default function ResumePage() {
                   </div>
                 )}
 
-                {/* View Education */}
                 {resume.educations?.length > 0 && (
                   <div className={styles.section}>
                     <h2>Education</h2>
@@ -395,7 +394,6 @@ export default function ResumePage() {
                   </div>
                 )}
 
-                {/* View Certifications */}
                 {resume.certifications?.length > 0 && (
                   <div className={styles.section}>
                     <h2>Certifications</h2>
@@ -415,4 +413,3 @@ export default function ResumePage() {
     </div>
   );
 }
-

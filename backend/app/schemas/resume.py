@@ -1,61 +1,26 @@
-from pydantic import BaseModel, Field
-from typing import Optional, List
+from pydantic import BaseModel
+from typing import List, Optional
 
+class CertificationCreate(BaseModel):
+    cert_name: str
+    issuing_organization: str
 
-class EducationBase(BaseModel):
-    school_name: str = Field(..., min_length=1, max_length=200)
-    degree: str = Field(..., min_length=1, max_length=200)
-
-
-class EducationCreate(EducationBase):
-    pass
-
-
-class EducationResponse(EducationBase):
-    education_id: int
-    resume_id: int
-
-    class Config:
-        from_attributes = True
-
-
-class CertificationBase(BaseModel):
-    cert_name: str = Field(..., min_length=1, max_length=200)
-    issuing_organization: str = Field(..., min_length=1, max_length=200)
-
-
-class CertificationCreate(CertificationBase):
-    pass
-
-
-class CertificationResponse(CertificationBase):
-    cert_id: int
-    resume_id: int
-
-    class Config:
-        from_attributes = True
-
-
-class ResumeBase(BaseModel):
+class ResumeCreate(BaseModel):
     about_me: Optional[str] = None
-
-
-class ResumeCreate(ResumeBase):
-    educations: Optional[List[EducationCreate]] = []
-    certifications: Optional[List[CertificationCreate]] = []
-    skills: Optional[List[int]] = []  # List of skill IDs
-
+    skills: List[str] = []
+    certifications: List[CertificationCreate] = []
 
 class ResumeUpdate(BaseModel):
     about_me: Optional[str] = None
+    skills: Optional[List[str]] = None
+    certifications: Optional[List[CertificationCreate]] = None
 
-
-class ResumeResponse(ResumeBase):
+class ResumeResponse(BaseModel):
     resume_id: int
-    seeker_id: int
-    file_path: Optional[str] = None
-    educations: Optional[List[EducationResponse]] = []
-    certifications: Optional[List[CertificationResponse]] = []
+    job_seeker_id: int
+    about_me: Optional[str] = None
+    resume_skills: Optional[List[dict]] = []
+    certifications: Optional[List[CertificationCreate]] = []
 
     class Config:
         from_attributes = True

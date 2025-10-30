@@ -1,14 +1,11 @@
-from sqlalchemy import Column, Integer, Date, ForeignKey
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import Column, Integer, String, ForeignKey, Date
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 import enum
-from datetime import date
 
 
 class ApplicationStatus(str, enum.Enum):
     pending = "pending"
-    reviewed = "reviewed"
     accepted = "accepted"
     rejected = "rejected"
 
@@ -17,11 +14,10 @@ class Application(Base):
     __tablename__ = "applications"
 
     application_id = Column(Integer, primary_key=True, index=True)
-    job_id = Column(Integer, ForeignKey("jobs.job_id", ondelete="CASCADE"), nullable=False)
-    seeker_id = Column(Integer, ForeignKey("job_seekers.seeker_id", ondelete="CASCADE"), nullable=False)
-    application_date = Column(Date, default=date.today, nullable=False)
-    status = Column(ENUM(ApplicationStatus, name='applicationstatus', create_type=False),
-                    default=ApplicationStatus.pending, nullable=False)
+    job_id = Column(Integer, ForeignKey("jobs.job_id"), nullable=False)
+    job_seeker_id = Column(Integer, ForeignKey("job_seekers.job_seeker_id"), nullable=False)
+    application_date = Column(Date)
+    status = Column(String)
 
     # Relationships
     job = relationship("Job", back_populates="applications")

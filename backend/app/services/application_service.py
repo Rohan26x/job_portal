@@ -1,73 +1,90 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
-from typing import List
-from datetime import date
 from app.db.models.application import Application, ApplicationStatus
-from app.schemas.application import ApplicationCreate, ApplicationUpdate
+from app.db.models.job import Job
+from app.db.models.job_seeker import JobSeeker
 
 
 class ApplicationService:
-    """Service for application operations"""
+    """Service for managing job applications"""
 
     @staticmethod
-    def create_application(db: Session, app_data: ApplicationCreate, seeker_id: int) -> Application:
+    def create_application(db: Session, job_id: int, job_seeker_id: int):
         """Create a new job application"""
-        # Check if already applied
-        existing = db.query(Application).filter(
-            Application.job_id == app_data.job_id,
-            Application.seeker_id == seeker_id
-        ).first()
-
-        if existing:
+        # Check if job exists
+        job = db.query(Job).filter(Job.job_id == job_id).first()
+        if not job:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Already applied to this job"
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Job not found"
             )
 
-        db_application = Application(
-            job_id=app_data.job_id,
-            seeker_id=seeker_id,
-            application_date=date.today(),
+        # Check if application already exists
+        existing_application = db.query(Application).filter(
+            Application.job_id == job_id,
+            Application.job_seeker_id == job_seeker_id
+        ).first()
+
+        if existing_application:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="You have already applied to this job"
+            )
+
+        # Create new application
+        application = Application(
+            job_id=job_id,
+            job_seeker_id=job_seeker_id,
             status=ApplicationStatus.pending
         )
-        db.add(db_application)
+
+        db.add(application)
         db.commit()
-        db.refresh(db_application)
-        return db_application
+        db.refresh(application)
+
+        return application
 
     @staticmethod
-    def get_application_by_id(db: Session, application_id: int) -> Application:
-        """Get application by ID"""
+    def get_applications_by_job(db: Session, job_id: int):
+        """Get all applications for a specific job"""
+        return db.query(Application).filter(Application.job_id == job_id).all()
+
+    @staticmethod
+    def get_applications_by_seeker(db: Session, job_seeker_id: int):
+        """Get all applications by a job seeker"""
+        return db.query(Application).filter(Application.job_seeker_id == job_seeker_id).all()  # CHANGED HERE
+
+    @staticmethod
+    def update_application_status(db: Session, application_id: int, new_status: str):
+        """Update application status"""
         application = db.query(Application).filter(
             Application.application_id == application_id
         ).first()
+
         if not application:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Application not found"
             )
-        return application
 
-    @staticmethod
-    def get_applications_by_job(db: Session, job_id: int) -> List[Application]:
-        """Get all applications for a job"""
-        return db.query(Application).filter(Application.job_id == job_id).all()
+        # Validate status
+        try:
+            status_enum = ApplicationStatus(new_status)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid status. Must be one of: {[s.value for s in ApplicationStatus]}"
+            )
 
-    @staticmethod
-    def get_applications_by_seeker(db: Session, seeker_id: int) -> List[Application]:
-        """Get all applications by a job seeker"""
-        return db.query(Application).filter(Application.seeker_id == seeker_id).all()
-
-    @staticmethod
-    def update_application_status(
-            db: Session,
-            application_id: int,
-            update_data: ApplicationUpdate
-    ) -> Application:
-        """Update application status (recruiter only)"""
-        application = ApplicationService.get_application_by_id(db, application_id)
-
-        application.status = update_data.status
+        application.status = status_enum
         db.commit()
         db.refresh(application)
+
         return application
+
+    @staticmethod
+    def get_application_by_id(db: Session, application_id: int):
+        """Get application by ID"""
+        return db.query(Application).filter(
+            Application.application_id == application_id
+        ).first()
