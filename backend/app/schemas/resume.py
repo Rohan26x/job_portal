@@ -1,10 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
 
-class SkillResponse(BaseModel):
-    skill_id: int
-    skill_name: str
-
 class CertificationCreate(BaseModel):
     cert_name: str
     issuing_organization: str
@@ -23,7 +19,7 @@ class ResumeResponse(BaseModel):
     resume_id: int
     job_seeker_id: int
     about_me: Optional[str] = None
-    resume_skills: Optional[List[SkillResponse]] = []
+    resume_skills: Optional[List[dict]] = []
     certifications: Optional[List[CertificationCreate]] = []
 
     class Config:
